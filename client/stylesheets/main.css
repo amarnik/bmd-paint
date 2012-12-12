@@ -1,0 +1,32 @@
+/* 
+    Document   : main
+    Created on : Dec 8, 2012, 11:51:32 AM
+    Author     : artur
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.color_swatch {
+    width: 70px;
+    float: left;
+}
+
+.svg_container {
+    width: 600px;
+    height: 600px;
+    float: left;
+    border: 2px solid #000000;
+}
+
+.color_swatch li{ 
+    width: 40px;
+    height: 40px;
+    margin: 15px;
+    border: 2px solid #FFFFFF;
+    cursor: pointer;
+}
+
+.color_swatch li.selected{ 
+    border: 2px solid #000000;
+}
+

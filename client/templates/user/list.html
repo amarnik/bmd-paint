@@ -1,0 +1,8 @@
+
+<ul>
+    <% _.each( rc.users, function( user ){ %>
+        <li>
+            <%- user.name %> - <%- user.email %>
+        </li>
+    <% }); %>
+</ul>

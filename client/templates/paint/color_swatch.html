@@ -1,0 +1,10 @@
+<% console.log("tempalte loaded");%>
+<div class="color_swatch">
+Select Color:
+<ul>
+    <% _.each( colors, function( color){ %>
+    
+        <li style="background-color: <%- color.attributes.hex %>"></li>
+    <% }); %>
+</ul>
+</div>
