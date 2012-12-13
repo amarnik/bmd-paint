@@ -1,0 +1,17 @@
+<script id="FooterView" type="text/x-underscore-template">
+	<div class="assets" >
+		Assets
+	</div>
+</script>
+
+<script id="Toolbar" type="text/x-underscore-template">
+	<div class="toolbar" >
+		Toolbar
+	</div>
+</script>
+
+<script id="AssetsBar" type="text/x-underscore-template">
+	<div class="assets" >
+		Assets
+	</div>
+</script>

@@ -3,8 +3,8 @@
 		'common' : {},
 		'router': undefined,
 		'env': app.env,
-		'modules':{},
-		'utils':{}
+		'utils':{},
+		'sandbox': {}
 	};
 	
 	require.config({
