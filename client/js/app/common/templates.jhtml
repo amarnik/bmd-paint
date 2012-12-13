@@ -1,0 +1,11 @@
+<script id="MainCanvas" type="text/x-underscore-template">
+	<div class="capsule" >
+		This is main Canvas.
+	</div>
+</script>
+
+<script id="NotificationDialog" type="text/x-underscore-template">
+	<div class="capsule" >
+		This is main Noti.
+	</div>
+</script>
