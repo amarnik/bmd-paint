@@ -3,11 +3,17 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 	// define all the required CommonJS file for this module
 	require.config({
 	    shim: {
-	    	profile_model:{
-	    		
-	    	},
+	    	profile_model:{},
 	        profile_collection: {
 	            deps: ['profile_model']
+	        },
+	        
+	        canvas_models: {},
+	        canvas_collections: {
+	        	deps:['canvas_models']
+	        },
+	        canvas_views: {
+	        	deps:['canvas_models', 'canvas_collections']
 	        },
 	        toolbar: {
 	            
@@ -16,7 +22,11 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 	  paths: {
 	  	'profile_model': '/js/app/modules/canvas/models/profile',
 	    'profile_collection': '/js/app/modules/canvas/collections/profile',
-	    'toolbar_view': '/js/app/modules/canvas/views/toolbar'
+	    'toolbar_view': '/js/app/modules/canvas/views/toolbar',
+	    
+	    'canvas_models': '/js/app/modules/canvas/models/canvas',
+	    'canvas_collections': '/js/app/modules/canvas/collections/canvas',
+	    'canvas_views': '/js/app/modules/canvas/views/canvas'
 	  } //,
 	  //urlArgs: "cache_key=" + app.Bmd.env.cachebuster ,
 	
@@ -27,33 +37,32 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 	var Router = Backbone.Router.extend({
 			routes: {
 				'': 'index',
-				'!/draw': 'draw',
-				'!/catalog': 'catalog',
+				'!/browse': 'browse',
 				'!/subscription': 'subscription'
 			},
 			initialize: function(){
 				console.log('init router');
 			},
 
-			index: function(){
-				$("#current_page").html( 'OK… this is index ' );
-			},
-			draw: function(){
-				$("#current_page").html( 'OK… this is draw ' );
+			 
+			browse: function(){
+				// browse all the drawing submitted by users
 			},
 			
-			catalog: function(){
+			index: function(){
 				// load only files related to current route.
-				Bmd.utils.load(Bmd.sandbox, ['profile_model', 'profile_collection','toolbar_view'], ['text!/js/app/modules/canvas/templates/assets.jhtml', 'text!/js/app/modules/canvas/templates/canvas.jhtml'], function(){
-					// at this point, all the loaded modules and templates are in sandbox
-					$("#current_page").html( 'OK… this is catalog ' );
+				Bmd.utils.load(Bmd.sandbox, ['profile_model', 'profile_collection','canvas_models', 'canvas_collections', 'canvas_views'], ['text!/js/app/modules/canvas/templates/paint.jhtml', 'text!/js/app/modules/canvas/templates/canvas.jhtml'], function(){
+					// render the main view, if we need to load initial data, load here and pass it to view
+					var paint = new Bmd.sandbox.views.Paint();
+					$("#container").html( paint.render() );
+					
 				}, this);
 				
 			},
 			
 			subscription: function(page){
 				
-				$("#current_page").html( 'OK… this is subscription ' );
+				console.log( 'OK… this is subscription ' );
 			}
 		});
 		

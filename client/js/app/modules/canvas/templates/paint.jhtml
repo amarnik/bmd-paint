@@ -1,0 +1,6 @@
+<script id="Paint" type="text/x-underscore-template">
+	<div>
+		<div class='toolbar'></div>
+		<div class='painting-main'></div>
+	</div>
+</script>
