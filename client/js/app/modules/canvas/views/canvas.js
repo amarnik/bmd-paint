@@ -37,6 +37,9 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
                 target.addClass("selected");
                 selectedColor = target.css("background-color");
                 this.trigger("toolbar:colorSwatch:changed", {color: selectedColor});
+                
+                // testing global event bus
+                Bmd.trigger('bmd:toolbar:colorSelected', {color:selectedColor});
 			}
 		});
 
@@ -179,6 +182,9 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 				
 				// listen child controls' events
 				this.views.toolbar.on( "toolbar:colorSwatch:changed" , this.changeColorSwatch, this );
+				this.listenTo(Bmd, 'bmd:toolbar:colorSelected', function(options){
+					alert('Yay!!!, this is global event from event bus.  And color is::' + options.color );
+				})
             },
             render: function(){
             	// render layout

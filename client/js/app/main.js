@@ -1,11 +1,5 @@
 (function(app){
-	app.Bmd = {
-		'common' : {},
-		'router': undefined,
-		'env': app.env,
-		'utils':{},
-		'sandbox': {}
-	};
+	
 	
 	require.config({
 	    shim: {
@@ -34,7 +28,7 @@
 	    router: './modules/' + app.env.module + '/router'
 	  },
 	  baseUrl: '/js/app/', 
-	  urlArgs: "cache_key=" + app.Bmd.env.cachebuster ,
+	  urlArgs: "cache_key=" + app.env.cachebuster ,
 	
 	});
 	
@@ -42,11 +36,16 @@
 	    
 		// init 
 		domReady(function() {
-			// create env initialiation
-			app.Bmd.utils = utils;
+			// initialize global namespace
+			app.Bmd = _.extend({
+								'common' : _.extend( { models: {}, collections: {}, views: {}, templates: {} }, commonmvc ),
+								'router': undefined,
+								'env': app.env,
+								'utils': utils,
+								'sandbox': {}
+							}, Backbone.Events );
 			
-			// init common mvc and templates
-			app.Bmd.common = _.extend( { models: {}, collections: {}, views: {}, templates: {} }, commonmvc );
+			
 			
 			// init templates
 			$(templates).each(function() {	
