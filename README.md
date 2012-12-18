@@ -32,17 +32,16 @@ ToDo:
 HOW To USE IT:
 
 run node in main folder:
-#node app
+node app
 
-BROWSER: open browser and point to 
-http://localhost:3000/index.html
+BROWSER:
+- open browser and point to http://localhost:3000/index.html
 
 DESKTOP:
-install node-webkit (https://github.com/rogerwang/node-webkit)
-run:
-#/Applications/node-webkit.app/Contents/MacOS/node-webkit bmd-paint/client/
+- install node-webkit (https://github.com/rogerwang/node-webkit)
+- run: /Applications/node-webkit.app/Contents/MacOS/node-webkit bmd-paint/client/
 
 MOBILE (iOS):
-install PhoneGap and Xcode
-copy content of the 'client' folder to the 'www' folder in your phonegap app
-run the simulator (or deploy to the device)
+- install PhoneGap and Xcode
+- copy content of the 'client' folder to the 'www' folder in your phonegap app
+- run the simulator (or deploy to the device)
