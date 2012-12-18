@@ -59,6 +59,9 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
                 console.log(selectedColorModel);
                 
                 this.trigger("toolbar:colorSwatch:changed", {color: selectedColor});
+                
+                // testing global event bus
+                Bmd.trigger('bmd:toolbar:colorSelected', {color:selectedColor});
 			}
 		};
         }()) );
@@ -254,12 +257,9 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
                 
 				// listen child controls' events
 				this.views.toolbar.on( "toolbar:colorSwatch:changed" , this.changeColorSwatch, this );
-                //this.data.userprofile.on( 'change', this.updateUser, this );
-                
-            },
-            updateUser:function(){
-                //this.views.toolbar.render();
-                
+				this.listenTo(Bmd, 'bmd:toolbar:colorSelected', function(options){
+					alert('Yay!!!, this is global event from event bus.  And color is::' + options.color );
+				})
             },
             render: function(){
             	// render layout
