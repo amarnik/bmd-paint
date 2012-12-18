@@ -21,7 +21,7 @@
 		    		selectionCls = (i++==0)?'selected':'';
 		    %>
 		    	
-		        <li style="background-color: <%- color.attributes.hex %>" class="<%-selectionCls%>"></li>
+		        <li style="background-color: <%- color.get('hex') %>" class="<%-selectionCls%>" data-id="<%-color.get('hex')%>"></li>
 		    <% }); %>
 		</ul>
 	</div>

@@ -9,20 +9,30 @@ and open the template in the editor.
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="stylesheets/boilerplate.css" media="screen" rel="stylesheet" type="text/css">
         <link href="stylesheets/main.css" media="screen" rel="stylesheet" type="text/css">
-        <script data-main="/js/app/main" src="/js/libs/require.jquery/require-jquery.js"></script>
     </head>
     <body>
         
         <div id="container">
             
         </div>
+        
         <script>
+            
+            // node-webkit debug console
+            if ( typeof require != "undefined" ) {
+                var gui = require('nw.gui'); 
+                gui.Window.get().showDevTools(); 
+            }
+            
+            // node-webkit require fix
+            window.nodeRequire = window.require; 
+            window.require = undefined;
+            
 			this.env = {
 		  		cachebuster : 'v.0.0.1',
 		  		module : 'canvas'
 		  	};
 		</script>
-		
-		<div id="current_page">Loading …</div>
+        <script data-main="js/app/main" src="js/libs/require.jquery/require-jquery.js"></script>
     </body>
 </html>

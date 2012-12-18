@@ -20,13 +20,16 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 	        }
 	    },
 	  paths: {
-	  	'profile_model': '/js/app/modules/canvas/models/profile',
-	    'profile_collection': '/js/app/modules/canvas/collections/profile',
-	    'toolbar_view': '/js/app/modules/canvas/views/toolbar',
+	  	'profile_model': './modules/canvas/models/profile',
+	    'profile_collection': './modules/canvas/collections/profile',
+	    'toolbar_view': './modules/canvas/views/toolbar',
 	    
-	    'canvas_models': '/js/app/modules/canvas/models/canvas',
-	    'canvas_collections': '/js/app/modules/canvas/collections/canvas',
-	    'canvas_views': '/js/app/modules/canvas/views/canvas'
+	    'canvas_model': './modules/canvas/models/canvas',
+	    'canvas_collection': './modules/canvas/collections/canvas',
+	    'canvas_view': './modules/canvas/views/canvas',
+        
+        'line_model': './modules/canvas/models/line',
+	    'line_collection': './modules/canvas/collections/line',
 	  } //,
 	  //urlArgs: "cache_key=" + app.Bmd.env.cachebuster ,
 	
@@ -47,11 +50,18 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 			 
 			browse: function(){
 				// browse all the drawing submitted by users
+                alert('browse');
+                Bmd.utils.load(Bmd.sandbox, ['friends_model', 'profile_collection','canvas_model', 'canvas_collection', 'canvas_view'], ['text!./modules/canvas/templates/paint.jhtml', 'text!./modules/canvas/templates/canvas.jhtml'], function(){
+					// render the main view, if we need to load initial data, load here and pass it to view
+					var paint = new Bmd.sandbox.views.Paint();
+					$("#container").html( paint.render() );
+					
+				}, this);
 			},
 			
 			index: function(){
 				// load only files related to current route.
-				Bmd.utils.load(Bmd.sandbox, ['profile_model', 'profile_collection','canvas_models', 'canvas_collections', 'canvas_views'], ['text!/js/app/modules/canvas/templates/paint.jhtml', 'text!/js/app/modules/canvas/templates/canvas.jhtml'], function(){
+				Bmd.utils.load(Bmd.sandbox, ['profile_model', 'profile_collection', 'canvas_model', 'canvas_collection', 'canvas_view', 'line_model', 'line_collection'], ['text!./modules/canvas/templates/paint.jhtml', 'text!./modules/canvas/templates/canvas.jhtml'], function(){
 					// render the main view, if we need to load initial data, load here and pass it to view
 					var paint = new Bmd.sandbox.views.Paint();
 					$("#container").html( paint.render() );

@@ -7,17 +7,34 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
         /**
 		 * Toolbar view
 		 */
-        sandbox.views.Toolbar = Backbone.View.extend({
+        sandbox.views.Toolbar = Backbone.View.extend((function(){
+            // private data/methods
+            var _this;
+            
+            var _doSomethings = function(){
+                
+                
+                
+            };
+            
+            
+            //expose public attr
+            return {
+            
         	events: {
         		'click .color_swatch li': 'colorSelected'
         	},
 		    initialize: function(){
+                _this = this;
 				this.data = {
 					colorSwatches : new sandbox.collections.ColorSwatchs([
 						{ name: "Black", hex: "#000000" },
+                        { name: "Red", hex: "#FF0000" },
 						{ name: "Green", hex: "#00FF00" },
-						{ name: "Blue", hex: "#0000FF" },
-					])
+						{ name: "Blue", hex: "#0000FF" }
+					]),
+                    lineThickness: 2,
+                    lineOpacity: 1
 				};
             },
             render: function(){
@@ -35,10 +52,16 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 					
 				$(".color_swatch li").removeClass("selected");
                 target.addClass("selected");
-                selectedColor = target.css("background-color");
+                selectedColor = target.data('id');
+                    //target.css("background-color");
+                //var selectedColorModel = this.data.colorSwatches.where({hex:selectedColor});
+                var selectedColorModel = this.data.colorSwatches.get(selectedColor);
+                console.log(selectedColorModel);
+                
                 this.trigger("toolbar:colorSwatch:changed", {color: selectedColor});
 			}
-		});
+		};
+        }()) );
 
 
 		/**
@@ -50,13 +73,22 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 				"touchmove #paintSVG": "acceptDrawing"		// TODO::TEST IT, not sure if it can capture the event. otherwise, need to move to initialize() method
 			},
 		    initialize: function(){
+                var self = this;
+                
 		    	this.data = {
 					currentTool : 'line',
 					currentColor: '#000000', //TODO:: change to color model
-					mode: (window.PhoneGap==true)?'MOBILE':'BROWSER',
 					currentLineId : 0,
-					userId: 12		//TODO:: move to userModel
+                    lineThickness: 2,
+                    lineOpacity: 1,
+                    lines : new sandbox.collections.Lines()
 				};
+                
+                this.data.lines.on("add", this.drawNewLine, this);
+                this.data.lines.on("change", this.drawUpdateLine, this);
+                
+                Bmd.socket.on('newLine', function(data) { self.startNewLine(data) });
+                Bmd.socket.on('continueLine', function(data) { self.continueLine(data) });
 				
             },
             render: function(){
@@ -69,22 +101,15 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 			},
 			acceptDrawing: function(e) {
 				var self = this;
-				if( self.data.mode == 'MOBILE' ){
+                
+                console.log("start new line");
+                self.data.currentLineId++;
+                var lineId = Bmd.data.userId + "_" + self.data.currentLineId;
+                
+				if( Bmd.data.mode == 'MOBILE' ){
 					e.preventDefault();
                     var x = e.touches[0].pageX;
                     var y = e.touches[0].pageY;
-					
-					self.data.currentLineId++;
-
-                    var data = { 
-                        id: self.data.userId + "_" + self.data.currentLineId,
-                        color: self.data.currentColor,
-                        x: x,
-                        y: y
-                    }
-
-                    //_socket.emit('newLine', data);
-                    self.startNewLine( data );
                     
                     self.$("#paintSVG").on("touchmove", function(e) {
                         e.preventDefault();
@@ -92,12 +117,12 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
                         var x = e.touches[0].pageX;
                         var y = e.touches[0].pageY;
 						var data = { 
-                            id: self.data.userId + "_" + self.data.currentLineId,
+                            id: lineId,
                             x: x,
                             y: y
                         }
 
-                        //_socket.emit('continueLine', data);
+                        Bmd.socket.emit('continueLine', data);
                         self.continueLine( data );
                     });
 
@@ -105,33 +130,41 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
                         self.$("#paintSVG").off("touchmove");
                     });
 				} else {
+                    console.log("browser draw!");
 					// browser draw
-					var x = e.offsetX,
-						y = e.offsetY;
-
-                    console.log("start new line");                    
-                    self.data.currentLineId++;
-
-                    var data = { 
-                        id: self.data.userId + "_" + self.data.currentLineId,
-                        color: self.data.currentColor,
-                        x: x,
-                        y: y
+                    if(e.offsetX==undefined) // this works for Firefox
+                    {
+                        x = e.pageX-$('#paintSVG').offset().left;
+                        y = e.pageY-$('#paintSVG').offset().top;
+                    }             
+                    else
+                    {
+                        x = e.offsetX;
+                        y = e.offsetY;
                     }
-
-                    //_socket.emit('newLine', data);
-                    self.startNewLine( data );
+                    
 
                     $(window).on("mousemove", function(e) {
-                        var x = e.offsetX;
-                        var y = e.offsetY;
+                        
+                        if(e.offsetX==undefined) // this works for Firefox
+                        {
+                            x = e.pageX-$('#paintSVG').offset().left;
+                            y = e.pageY-$('#paintSVG').offset().top;
+                        }             
+                        else
+                        {
+                            x = e.offsetX;
+                            y = e.offsetY;
+                        }
+                        
+                        
                         var data = { 
-                            id: self.data.userId + "_" + self.data.currentLineId,
+                            id: lineId,
                             x: x,
                             y: y
                         }
 
-                        //_socket.emit('continueLine', data);
+                        Bmd.socket.emit('continueLine', data);
                         self.continueLine( data );
                     });
 
@@ -139,30 +172,68 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
                         $(window).off("mousemove");
                     });
 				}
-				
+                
+                var data = { 
+                    id: lineId,
+                    color: self.data.currentColor,
+                    stroke: self.data.lineThickness,
+                    opacity: self.data.lineOpacity,
+                    x: x,
+                    y: y
+                }
+
+                Bmd.socket.emit('newLine', data);
+                self.startNewLine( data );
+
 			},
 			startNewLine: function( data ) {
+                
+                console.log("new line:  "+ data.x + " , " + data.y);
+                
+                var line = new sandbox.models.Line({
+                    id: data.id,
+                    d: 'M' + data.x + ' ' + data.y,
+                    color: data.color,
+                    stroke: data.stroke,
+                    opacity: data.opacity,
+                    x: data.x,
+                    y: data.y
+                });
+                
+                this.data.lines.add(line);
+
+            },
+            continueLine: function( data ) {
+                console.log("continue line:  "+ data.x + " , " + data.y);
+                
+                var line = this.data.lines.get(data.id);
+                
+                var newPathString = line.get('d') + " L"+data.x+","+data.y;
+                line.set("d", newPathString);
+            },
+            drawNewLine: function( line ) {
+                
                 var circle = document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
-                circle.setAttribute("cx", data.x);
-                circle.setAttribute("cy", data.y);
-                circle.setAttribute("r", 2);
-                circle.setAttribute("fill", data.color);
+                circle.setAttribute("cx", line.get('x'));
+                circle.setAttribute("cy", line.get('y'));
+                circle.setAttribute("r", line.get('stroke') / 2);
+                circle.setAttribute("opacity", line.get('opacity'));
+                circle.setAttribute("fill", line.get('color'));
                 this.$("#main").append(circle);
                 
                 
                 var path = document.createElementNS( "http://www.w3.org/2000/svg", "path" )
-                path.setAttribute("d", 'M' + data.x + ' ' + data.y);
-                path.setAttribute("id", data.id);
+                path.setAttribute("d", line.get('d'));
+                path.setAttribute("id", line.get('id'));
                 path.setAttribute("fill", "none");
-                path.setAttribute("stroke", data.color);
-                path.setAttribute("stroke-width", 2);
+                path.setAttribute("stroke", line.get('color'));
+                path.setAttribute("stroke-width", line.get('stroke'));
+                path.setAttribute("opacity", line.get('opacity'));
                 this.$("#main").append(path);
             },
-            continueLine: function( data ) {
-                var line = $("#"+data.id);
-                var pathString = line.attr("d");
-                pathString += " L"+data.x+","+data.y;
-                line.attr("d", pathString);
+            drawUpdateLine: function(line) {
+                var $line = $("#"+line.get('id'));
+                $line.attr("d", line.get('d'));
             }
 		});
         
@@ -177,8 +248,18 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 					canvas : new sandbox.views.Canvas()
 				};
 				
+                this.data = {
+                    // userprofile: new sandbox.models.Profile()
+                };
+                
 				// listen child controls' events
 				this.views.toolbar.on( "toolbar:colorSwatch:changed" , this.changeColorSwatch, this );
+                //this.data.userprofile.on( 'change', this.updateUser, this );
+                
+            },
+            updateUser:function(){
+                //this.views.toolbar.render();
+                
             },
             render: function(){
             	// render layout
@@ -191,6 +272,11 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
                 return this.$el;
             },
             
+            handlers: {
+                
+                
+            },
+            
             /**
 			 * event handlers
 			 */
@@ -198,7 +284,12 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 				var selectedColor = options.color;
 				this.views.canvas.setCurrentColor(selectedColor);
 			},
-			
+            changeLineThickness: function(options){
+				
+			},
+            changeLineOpacity: function(options){
+				
+			},
 			
             initConnection: function(userId, socket) {
             	var self = this;

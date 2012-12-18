@@ -1,8 +1,8 @@
 define( ['underscore', 'backbone' ], function( _, Backbone ) {
 	var init = function(sandbox){
 		// add all the views
-		sandbox.collections.ColorSwatchs = Backbone.Collection.extend({
-			model: sandbox.models.Color
+		sandbox.collections.Lines = Backbone.Collection.extend({
+			model: sandbox.models.Line
 		});
 		
 		

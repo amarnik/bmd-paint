@@ -4,7 +4,8 @@
 		'router': undefined,
 		'env': app.env,
 		'utils':{},
-		'sandbox': {}
+		'sandbox': {},
+        'socket': undefined
 	};
 	
 	require.config({
@@ -21,24 +22,28 @@
 	        },
 	        utils: {
 	        	deps: ["underscore", "jquery"]
-	        }
+	        },
+            socketio: {
+                exports: 'io'
+            }
 	    },
 	  paths: {
-	  	underscore: '/js/libs/mvc/underscore',
-	    backbone: '/js/libs/mvc/backbone',
-	    text: '/js/app/text',  
-	    domready: '/js/libs/require.jquery/domready',
-	    commonmvc: '/js/app/common/mvc',
-	    template: 'text!/js/app/common/templates.jhtml',
-	    utils: '/js/app/common/utils',
-	    router: './modules/' + app.env.module + '/router'
+	  	underscore: '../libs/mvc/underscore',
+	    backbone: '../libs/mvc/backbone',
+	    text: '../app/text',  
+	    domready: '../libs/require.jquery/domready',
+	    commonmvc: '../app/common/mvc',
+	    template: 'text!../app/common/templates.jhtml',
+	    utils: '../app/common/utils',
+	    router: './modules/' + app.env.module + '/router',
+        socketio: '../libs/socket.io.min'
 	  },
-	  baseUrl: '/js/app/', 
+	  baseUrl: 'js/app/', 
 	  urlArgs: "cache_key=" + app.Bmd.env.cachebuster ,
 	
 	});
 	
-	require(["jquery", "domready", "underscore", "backbone", "utils", "router", "commonmvc", 'text!/js/app/common/templates.jhtml'], function($, domReady, _, Backbone, utils, Router, commonmvc, templates) {
+	require(["jquery", "domready", "underscore", "backbone", "utils", "router", "commonmvc", "socketio", 'text!../app/common/templates.jhtml'], function($, domReady, _, Backbone, utils, Router, commonmvc, io, templates) {
 	    
 		// init 
 		domReady(function() {
@@ -47,6 +52,11 @@
 			
 			// init common mvc and templates
 			app.Bmd.common = _.extend( { models: {}, collections: {}, views: {}, templates: {} }, commonmvc );
+            
+            // init app global data
+            app.Bmd.data = {
+                mode: (window.PhoneGap == true) ? 'MOBILE' : 'BROWSER'
+            }
 			
 			// init templates
 			$(templates).each(function() {	
@@ -57,6 +67,14 @@
 						}
 					});
 			
+            // connect the socket
+            app.Bmd.socket = io.connect('http://localhost:3000');
+            app.Bmd.socket.emit('init', { });
+
+            app.Bmd.socket.on('accepted', function (data) {
+                app.Bmd.data.userId = data.userId;
+                console.log("connection accepted");
+            });
 			
 			// init Router
 			app.Bmd.router = new Router();
