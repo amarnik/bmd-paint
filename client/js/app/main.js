@@ -1,12 +1,4 @@
 (function(app){
-	app.Bmd = {
-		'common' : {},
-		'router': undefined,
-		'env': app.env,
-		'utils':{},
-		'sandbox': {},
-        'socket': undefined
-	};
 	
 	require.config({
 	    shim: {
@@ -39,7 +31,7 @@
         socketio: '../libs/socket.io.min'
 	  },
 	  baseUrl: 'js/app/', 
-	  urlArgs: "cache_key=" + app.Bmd.env.cachebuster ,
+	  urlArgs: "cache_key=" + app.env.cachebuster 
 	
 	});
 	
@@ -55,10 +47,6 @@
 								'utils': utils,
 								'sandbox': {}
 							}, Backbone.Events );
-			
-			
-			// init common mvc and templates
-			app.Bmd.common = _.extend( { models: {}, collections: {}, views: {}, templates: {} }, commonmvc );
             
             // init app global data
             app.Bmd.data = {
