@@ -4,7 +4,7 @@
 	    <defs>
 	    </defs>
 	        <g id="main">
-	
+                <rect x="0" y="0" fill="#FFF" width="600px" height="600px" id="paintPaper" />
 	        </g>
 	    </svg>
 	</div>

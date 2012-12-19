@@ -65,11 +65,12 @@ io.sockets.on('connection', function (socket) {
   
 });
 
+/* disabled for now
 var db = mongoose.createConnection('localhost', 'fms');
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
     // yay!
     });
-
+*/
 user.init(app);

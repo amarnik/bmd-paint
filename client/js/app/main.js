@@ -50,7 +50,7 @@
             
             // init app global data
             app.Bmd.data = {
-                mode: (window.PhoneGap == true) ? 'MOBILE' : 'BROWSER'
+                mode: (window.PhoneGap) ? 'MOBILE' : 'BROWSER'
             }
 			
 			// init templates
@@ -63,7 +63,7 @@
 					});
 			
             // connect the socket
-            app.Bmd.socket = io.connect('http://localhost:3000');
+            app.Bmd.socket = io.connect('http://bmd.aws.af.cm');
             app.Bmd.socket.emit('init', { });
 
             app.Bmd.socket.on('accepted', function (data) {

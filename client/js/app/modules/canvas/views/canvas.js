@@ -22,7 +22,8 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
             return {
             
         	events: {
-        		'click .color_swatch li': 'colorSelected'
+        		'click .color_swatch li': 'colorSelected',
+                'touchstart .color_swatch li': 'colorSelected'
         	},
 		    initialize: function(){
                 _this = this;
@@ -40,6 +41,7 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
             render: function(){
             	console.log('rendering toolbar');
                 $(this.el).html(sandbox.templates.ColorSwatch({ colors: this.data.colorSwatches.models} ));
+                
                 return this.$el;
 			},
 			
@@ -72,8 +74,8 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 		 */
 		sandbox.views.Canvas = Backbone.View.extend({
 			events: {
-				"mousedown #paintSVG": "acceptDrawing",
-				"touchmove #paintSVG": "acceptDrawing"		// TODO::TEST IT, not sure if it can capture the event. otherwise, need to move to initialize() method
+				//"mousedown #paintSVG": "acceptDrawing",
+				//"touchmove #paintSVG": "acceptDrawing"		// TODO::TEST IT, not sure if it can capture the event. otherwise, need to move to initialize() method
 			},
 		    initialize: function(){
                 var self = this;
@@ -95,7 +97,25 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 				
             },
             render: function(){
+                var self = this;
+                
                 $(this.el).html(sandbox.templates.SVGCanvas({ } ));
+                
+                // atttach events
+                if( Bmd.data.mode == 'MOBILE' ){
+                    console.log("MOBILE - ADD TOUCH EVENT");
+                    $("#paintPaper", $(this.el)).on('touchstart', function( e ) {
+                        console.log("touchstart");
+                        self.acceptDrawing.call(self, e.originalEvent);
+                    });
+                    
+                } else {
+                    $("#paintPaper", $(this.el)).on('mousedown', function( e ) {
+                        console.log("mousedown");
+                        self.acceptDrawing.call(self, e);
+                    });
+                }
+                
                 return this.$el;
 			},
 			setCurrentColor: function(color){
@@ -104,21 +124,24 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 			},
 			acceptDrawing: function(e) {
 				var self = this;
-                
-                console.log("start new line");
+
                 self.data.currentLineId++;
                 var lineId = Bmd.data.userId + "_" + self.data.currentLineId;
                 
 				if( Bmd.data.mode == 'MOBILE' ){
+
 					e.preventDefault();
-                    var x = e.touches[0].pageX;
-                    var y = e.touches[0].pageY;
+
+                    var x = e.touches[0].pageX-$('#paintSVG').offset().left;
+                    var y = e.touches[0].pageY-$('#paintSVG').offset().top;
                     
-                    self.$("#paintSVG").on("touchmove", function(e) {
-                        e.preventDefault();
-                        console.log("x:" + e.touches[0].pageX);
-                        var x = e.touches[0].pageX;
-                        var y = e.touches[0].pageY;
+                    $("#paintPaper").on("touchmove", function(e) {
+                        //e.originalEvent.preventDefault();
+                        console.log("x:" + e.originalEvent.touches[0].pageX);
+                        
+                        var x = e.originalEvent.touches[0].pageX-$('#paintSVG').offset().left;
+                        var y = e.originalEvent.touches[0].pageY-$('#paintSVG').offset().top;
+                        
 						var data = { 
                             id: lineId,
                             x: x,
@@ -129,11 +152,11 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
                         self.continueLine( data );
                     });
 
-                    self.$("#paintSVG").on("touchend", function( e ) {
-                        self.$("#paintSVG").off("touchmove");
+                    $("#paintPaper").on("touchend", function( e ) {
+                        $("#paintPaper").off("touchmove");
                     });
+                    
 				} else {
-                    console.log("browser draw!");
 					// browser draw
                     if(e.offsetX==undefined) // this works for Firefox
                     {
@@ -191,8 +214,6 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 			},
 			startNewLine: function( data ) {
                 
-                console.log("new line:  "+ data.x + " , " + data.y);
-                
                 var line = new sandbox.models.Line({
                     id: data.id,
                     d: 'M' + data.x + ' ' + data.y,
@@ -207,8 +228,6 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 
             },
             continueLine: function( data ) {
-                console.log("continue line:  "+ data.x + " , " + data.y);
-                
                 var line = this.data.lines.get(data.id);
                 
                 var newPathString = line.get('d') + " L"+data.x+","+data.y;
@@ -258,7 +277,7 @@ define( ['underscore', 'backbone' ], function( _, Backbone ) {
 				// listen child controls' events
 				this.views.toolbar.on( "toolbar:colorSwatch:changed" , this.changeColorSwatch, this );
 				this.listenTo(Bmd, 'bmd:toolbar:colorSelected', function(options){
-					alert('Yay!!!, this is global event from event bus.  And color is::' + options.color );
+					console.log('Yay!!!, this is global event from event bus.  And color is::' + options.color );
 				})
             },
             render: function(){
