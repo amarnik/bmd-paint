@@ -1,0 +1,5 @@
+use build.sh to build production version of [client]
+
+(1) it will create a folder called client.prod
+(2) update your nodejs app.js to point to client.prod for production version
+(3) or create a config file to point to client.prod and client based on the port that app.js is listening

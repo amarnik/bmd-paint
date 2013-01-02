@@ -22,20 +22,22 @@
 	  paths: {
 	  	underscore: '../libs/mvc/underscore',
 	    backbone: '../libs/mvc/backbone',
-	    text: '../app/text',  
+	    socketio: '../libs/socket.io.min',
+	    text: 'text',  
 	    domready: '../libs/require.jquery/domready',
-	    commonmvc: '../app/common/mvc',
-	    template: 'text!../app/common/templates.jhtml',
-	    utils: '../app/common/utils',
-	    router: './modules/' + app.env.module + '/router',
-        socketio: '../libs/socket.io.min'
+	    
+	    commonmvc: 'common/mvc',
+	    utils: 'common/utils',
+	    router: './modules/' + app.env.module + '/router'
+	    
 	  },
 	  baseUrl: 'js/app/', 
 	  urlArgs: "cache_key=" + app.env.cachebuster 
 	
 	});
 	
-	require(["jquery", "domready", "underscore", "backbone", "utils", "router", "commonmvc", "socketio", 'text!../app/common/templates.jhtml'], function($, domReady, _, Backbone, utils, Router, commonmvc, io, templates) {
+	var _templates = 'text!../app/common/templates.jhtml'
+	require(["jquery", "domready", "underscore", "backbone", "utils", "router", "commonmvc", "socketio", _templates], function($, domReady, _, Backbone, utils, Router, commonmvc, io, templates) {
 	    
 		// init 
 		domReady(function() {

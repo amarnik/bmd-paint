@@ -1,4 +1,4 @@
-define( ['underscore', 'backbone' ], function( _, Backbone ) {
+define( function( ) {
 	var init = function(sandbox){
 		// add all the views
 		sandbox.collections.Profiles = Backbone.Collection.extend({

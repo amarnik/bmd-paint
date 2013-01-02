@@ -1,4 +1,4 @@
-define( ['underscore', 'backbone' ], function( _, Backbone ) {
+define( function( ) {
 	var init = function(sandbox){
 		// add all the views
 		sandbox.models.Color = Backbone.Model.extend({

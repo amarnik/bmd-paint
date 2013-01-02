@@ -1,4 +1,4 @@
-define( ['underscore', 'backbone' ], function( _, Backbone ) {
+define( function( ) {
 	var init = function(sandbox){
 		
  		//var _color = "#000000", _socket, _userId, _lineId = 0;
